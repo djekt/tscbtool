@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -11,6 +11,8 @@ namespace TSCBTool
         tscbheader h = new tscbheader("",0,0,0,0,0,0,0,0,0,0,0);
         List<tscbentry> m = new List<tscbentry>();
         List<tscbentry> t = new List<tscbentry>();
+        string filename;
+
         public Form1()
         {
             InitializeComponent();
@@ -26,6 +28,7 @@ namespace TSCBTool
             openFileDialog1.ShowDialog();
             if (openFileDialog1.FileName != "")
             {
+                filename = openFileDialog1.FileName;
                 int i = 0;
                 tscbreader r = new tscbreader(openFileDialog1.FileName);
                 headerTree.Nodes.Clear();
@@ -92,6 +95,7 @@ namespace TSCBTool
                 tileTree.EndUpdate();
                 proBar.Value = 0;
                 saveToolStripMenuItem.Enabled = true;
+                saveToolStripMenuItem1.Enabled = true;
             }
         }
 
@@ -225,7 +229,6 @@ namespace TSCBTool
 
         private void extraInfoUpdate(int i)
         {
-            tileTree.BeginUpdate();
             if (bothRad.Checked == true)
             {
                 tileTree.Nodes[i].Nodes[11].Text = "True";
@@ -254,11 +257,11 @@ namespace TSCBTool
                 t[i].Water = false;
                 t[i].Grass = false;
             }
-            tileTree.EndUpdate();
         }
 
         private void updtileBtn_Click(object sender, EventArgs e)
         {
+            tileTree.BeginUpdate();
             tileTree.SelectedNode.Nodes[0].Text = xBox.Text;
             t[tileTree.SelectedNode.Index].X = Convert.ToSingle(xBox.Text);
             tileTree.SelectedNode.Nodes[1].Text = yBox.Text;
@@ -276,10 +279,12 @@ namespace TSCBTool
             tileTree.SelectedNode.Nodes[8].Nodes[0].Text = fnameBox.Text;
             t[tileTree.SelectedNode.Index].File = fnameBox.Text;
             extraInfoUpdate(tileTree.SelectedNode.Index);
+            tileTree.EndUpdate();
         }
 
         private void setAllBtn_Click(object sender, EventArgs e)
         {
+            tileTree.BeginUpdate();
             proBar.Maximum = tileTree.Nodes.Count;
             proBar.Value = 0;
             int u = 0;
@@ -290,6 +295,12 @@ namespace TSCBTool
                 u += 1;
             }
             proBar.Value = 0;
+            tileTree.EndUpdate();
+        }
+
+        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            tscbwriter write = new tscbwriter(filename, h, m, t);
         }
     }
 }
